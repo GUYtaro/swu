@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neumorphic Animated Switch</title>
+
+<style>
+/* =========================================
+   1. ตั้งค่าพื้นฐานของหน้าเว็บ
+   ========================================= */
+
+/* ใช้ box-sizing เพื่อให้คำนวณขนาดได้ง่าย */
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* จัดสวิตช์ให้อยู่ตรงกลางหน้าจอ */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #343434, #202020);
+  font-family: Arial, sans-serif;
+}
+
+
+/* =========================================
+   2. กรอบหลักของสวิตช์
+   ========================================= */
+
+.switch {
+  position: relative;
+  width: 340px;
+  height: 112px;
+  padding: 8px;
+  border-radius: 60px;
+  background: #252525;
+
+  /* เงาด้านนอกและเงาด้านในแบบ Neumorphism */
+  box-shadow:
+    0 15px 30px #0008,
+    inset 0 3px 8px #000,
+    inset 0 -2px 4px #ffffff12;
+}
+
+
+/* =========================================
+   3. Checkbox สำหรับเก็บสถานะ ON/OFF
+   ========================================= */
+
+/* ซ่อน checkbox แต่ยังคงให้ทำงานได้ตามปกติ */
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+
+/* =========================================
+   4. รางด้านหลังของสวิตช์
+   ========================================= */
+
+.switch-track {
+  position: absolute;
+  inset: 8px;
+  overflow: hidden;
+  border-radius: 55px;
+  background: #302626;
+  box-shadow: inset 0 0 20px #000b;
+}
+
+/* พื้นหลังสีเขียวสำหรับฝั่ง ON */
+.switch-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  border-radius: inherit;
+
+  /* ไล่สีจากเขียวไปเทาเข้ม */
+  background: linear-gradient(
+    90deg,
+    #41683b 0%,
+    #263d24 50%,
+    #402b2b 100%
+  );
+
+  /* 
+     Animation จากสวิตช์ต้นฉบับแบบแรก
+     ขยายพื้นหลังเป็น 200% แล้วเลื่อนตำแหน่ง
+     เพื่อให้การเปลี่ยนสถานะมีความนุ่มนวล
+  */
+  transform: translate3d(-75%, 0, 0);
+
+  transition:
+    transform 0.4s cubic-bezier(.85, .05, .18, 1.35),
+    filter 0.4s ease;
+
+  filter: brightness(.75);
+}
+
+/* เมื่อเปิดสวิตช์ ให้พื้นหลังเลื่อนไปอีกฝั่ง */
+.switch input:checked ~ .switch-track::before {
+  transform: translate3d(25%, 0, 0);
+  filter: brightness(1.1);
+}
+
+/* เพิ่มเงาสีเขียวให้รางเมื่อเปิดใช้งาน */
+.switch input:checked ~ .switch-track {
+  box-shadow:
+    inset 0 0 25px #0009,
+    inset 0 0 12px #75ff6630;
+}
+
+
+/* =========================================
+   5. ข้อความ ON และ OFF
+   ========================================= */
+
+.status {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 2px;
+
+  /* ทำให้สีและแสงเปลี่ยนอย่างนุ่มนวล */
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* ข้อความ ON อยู่ทางซ้าย */
+.status-on {
+  left: 35px;
+  color: #81917e;
+}
+
+/* ข้อความ OFF อยู่ทางขวา */
+.status-off {
+  right: 28px;
+  color: #ff8b82;
+  text-shadow: 0 0 10px #ff443c;
+}
+
+/* เมื่อเปิด ให้ ON สว่างขึ้น */
+.switch input:checked ~ .status-on {
+  color: #b7ffac;
+  text-shadow:
+    0 0 5px #70ff5b,
+    0 0 12px #70ff5b;
+}
+
+/* เมื่อเปิด ให้ OFF ลดความสว่างลง */
+.switch input:checked ~ .status-off {
+  color: #a8a0a0;
+  text-shadow: none;
+}
+
+
+/* =========================================
+   6. ปุ่มเลื่อนสวิตช์
+   ========================================= */
+
+.switch-knob {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 8px;
+  width: 166px;
+  height: 96px;
+  border-radius: 50px;
+  cursor: pointer;
+
+  /* สีพื้นผิวโลหะสีดำ */
+  background: linear-gradient(
+    145deg,
+    #444,
+    #242424 55%,
+    #171717
+  );
+
+  /* เงานูนแบบ Neumorphism จากโค้ดแรก */
+  box-shadow:
+    -5px -5px 12px #ffffff13,
+    6px 7px 15px #000b,
+    inset 0 2px 3px #ffffff20,
+    inset 0 -4px 7px #000a;
+
+  /*
+     Animation การเลื่อนปุ่ม
+     ใช้ cubic-bezier เพื่อให้ปุ่มเคลื่อนที่
+     แล้วเด้งเล็กน้อยก่อนหยุด
+  */
+  transform: translate3d(0, 0, 0);
+
+  transition:
+    transform 0.4s cubic-bezier(.85, .05, .18, 1.35),
+    box-shadow 0.4s ease,
+    filter 0.3s ease;
+}
+
+/* พื้นผิวด้านในของปุ่ม */
+.switch-knob::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    145deg,
+    #353535,
+    #202020
+  );
+
+  /* เงาด้านในทำให้ปุ่มดูลึกและมีมิติ */
+  box-shadow:
+    inset 4px 4px 9px #0008,
+    inset -3px -3px 8px #ffffff0c;
+
+  transition:
+    box-shadow 0.4s ease,
+    background 0.4s ease;
+}
+
+/* ขีดไฟแสดงสถานะบนตัวปุ่ม */
+.switch-knob::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+
+  /* สถานะ OFF เป็นวงกลมสีเข้ม */
+  background: #343434;
+  border: 3px solid #1a1a1a;
+
+  box-shadow:
+    inset 0 0 8px #000,
+    0 2px 2px #ffffff18;
+
+  transition:
+    width 0.35s ease,
+    height 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease,
+    border-radius 0.35s ease;
+}
+
+
+/* =========================================
+   7. เมื่อสวิตช์เป็น ON
+   ========================================= */
+
+/* เลื่อนปุ่มไปทางขวา */
+.switch input:checked ~ .switch-knob {
+  transform: translate3d(158px, 0, 0);
+
+  /* เพิ่มแสงสีเขียวรอบปุ่ม */
+  box-shadow:
+    -5px -5px 12px #ffffff13,
+    6px 7px 15px #000b,
+    0 0 14px #75ff6625,
+    inset 0 2px 3px #ffffff20,
+    inset 0 -4px 7px #000a;
+}
+
+/* เปลี่ยนไฟจากวงกลมเป็นขีดแนวตั้ง */
+.switch input:checked ~ .switch-knob::after {
+  width: 7px;
+  height: 34px;
+  border-radius: 10px;
+  background: #83ff72;
+  border: 0;
+
+  /* เอฟเฟกต์ไฟเรืองแสง */
+  box-shadow:
+    0 0 5px #83ff72,
+    0 0 14px #83ff72,
+    0 0 25px #83ff7260;
+}
+
+/* เพิ่มแสงที่พื้นผิวด้านในเมื่อเปิด */
+.switch input:checked ~ .switch-knob::before {
+  box-shadow:
+    inset 4px 4px 9px #0008,
+    inset -3px -3px 8px #ffffff0c,
+    0 0 8px #75ff6610;
+}
+
+
+/* =========================================
+   8. เอฟเฟกต์เมื่อกดปุ่ม
+   ========================================= */
+
+/* ทำให้ปุ่มดูเหมือนถูกกดลงเล็กน้อย */
+.switch:active .switch-knob {
+  filter: brightness(1.15);
+}
+
+/* แสดงเส้นขอบเมื่อใช้คีย์บอร์ด */
+.switch input:focus-visible ~ .switch-knob {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+
+/* =========================================
+   9. ข้อความสถานะใต้สวิตช์
+   ========================================= */
+
+.caption {
+  position: absolute;
+  top: 135px;
+  left: 0;
+  width: 100%;
+  color: #aaa;
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 2px;
+
+  /* ทำให้ข้อความเปลี่ยนสีอย่างนุ่มนวล */
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* สีข้อความเมื่อระบบเปิด */
+.switch input:checked ~ .caption {
+  color: #83ff72;
+}
+
+
+/* =========================================
+   10. ปรับขนาดสำหรับหน้าจอมือถือ
+   ========================================= */
+
+@media (max-width: 380px) {
+  .switch {
+    transform: scale(.85);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!--
+  ใช้ label เป็นกรอบคลิกของสวิตช์
+  จึงไม่จำเป็นต้องเขียน JavaScript เพื่อสั่งคลิกปุ่ม
+-->
+<label class="switch" aria-label="Power switch">
+
+  <!-- Checkbox ใช้เก็บสถานะเปิดและปิด -->
+  <input
+    type="checkbox"
+    id="powerSwitch"
+    role="switch"
+    aria-label="เปิดหรือปิดระบบ"
+  >
+
+  <!-- พื้นหลังและรางของสวิตช์ -->
+  <div class="switch-track"></div>
+
+  <!-- ข้อความแสดงสถานะ -->
+  <span class="status status-on">ON</span>
+  <span class="status status-off">OFF</span>
+
+  <!-- ปุ่มที่เคลื่อนที่พร้อม Animation -->
+  <div class="switch-knob"></div>
+
+  <!-- ข้อความบอกสถานะระบบ -->
+  <div class="caption" id="switchCaption">
+    SYSTEM DISABLED
+  </div>
+
+</label>
+
+
+<script>
+/* =========================================
+   11. JavaScript สำหรับอัปเดตข้อความ
+   ========================================= */
+
+// เลือก checkbox และข้อความสถานะจาก HTML
+const powerSwitch = document.getElementById("powerSwitch");
+const switchCaption = document.getElementById("switchCaption");
+
+// ฟังก์ชันเปลี่ยนข้อความตามสถานะของสวิตช์
+function updateSwitch() {
+
+  // ถ้าติ๊ก checkbox ให้แสดง ENABLED
+  if (powerSwitch.checked) {
+    switchCaption.textContent = "SYSTEM ENABLED";
+  }
+
+  // ถ้าไม่ได้ติ๊ก ให้แสดง DISABLED
+  else {
+    switchCaption.textContent = "SYSTEM DISABLED";
+  }
+}
+
+// เรียกฟังก์ชันเมื่อมีการเปลี่ยนสถานะ
+powerSwitch.addEventListener("change", updateSwitch);
+
+// กำหนดข้อความให้ตรงกับสถานะเริ่มต้น
+updateSwitch();
+</script>
+
+</body>
+</html>

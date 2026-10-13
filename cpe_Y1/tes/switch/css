@@ -1,0 +1,61 @@
+
+/* ปุ่มสวิตช์ตรงกลาง */
+.switch-knob {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 8px;
+  width: 166px;
+  height: 96px;
+  border-radius: 50px;
+  cursor: pointer;
+
+  background: linear-gradient(
+    145deg,
+    #444,
+    #242424 55%,
+    #171717
+  );
+
+  box-shadow:
+    -5px -5px 12px #ffffff13,
+    6px 7px 15px #000b,
+    inset 0 2px 3px #ffffff20,
+    inset 0 -4px 7px #000a;
+
+  /* เพิ่มจังหวะเด้งแบบสปริง */
+  transition:
+    transform 0.65s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow 0.35s ease,
+    filter 0.2s ease;
+}
+
+/* ปุ่มยุบลงเล็กน้อยเมื่อกด */
+.switch:active .switch-knob {
+  filter: brightness(1.2);
+}
+
+/* เมื่อเปิด: เลื่อนขวาแล้วเด้งนิดหนึ่ง */
+.switch input:checked ~ .switch-knob {
+  transform: translate3d(158px, 0, 0);
+
+  box-shadow:
+    -5px -5px 12px #ffffff13,
+    6px 7px 15px #000b,
+    0 0 18px #75ff6640,
+    inset 0 2px 3px #ffffff20,
+    inset 0 -4px 7px #000a;
+}
+
+/* เพิ่มเอฟเฟกต์ยุบขณะกดปุ่ม */
+.switch:active .switch-knob::before {
+  transform: scale(.96);
+}
+
+/* พื้นผิวด้านในยุบและคืนตัวอย่างนุ่มนวล */
+.switch-knob::before {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
